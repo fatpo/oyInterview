@@ -10,7 +10,6 @@
 
 参数：
 ```
-
 public ThreadPoolExecutor(int corePoolSize,
                           int maximumPoolSize,
                           long keepAliveTime,
@@ -43,7 +42,7 @@ unit:
 workQueue: 
     the queue to use for holding tasks before they are executed.  
     This queue will hold only the {@code Runnable} tasks submitted by the {@code execute} method.
-    超过核心线程池的先放到队列里面存着。
+    超过核心线程池的先放到队列里面存着，默认是：lockingQueue<Runnable>。
     
 ```
 额外两个核心参数：
@@ -56,3 +55,4 @@ handler:
     the handler to use when execution is blocked because the thread bounds and queue capacities are reached
     连队列都满了的时候，采取的拒绝策略，默认是：AbortPolicy
 ```
+
