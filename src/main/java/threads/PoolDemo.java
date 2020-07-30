@@ -1,4 +1,4 @@
-package 线程池;
+package threads;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -6,7 +6,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 /**
  * Created by ouyang on 2020/7/16.
  */
-public class demo {
+public class PoolDemo {
     public static void main(String[] args) {
         test1();
     }

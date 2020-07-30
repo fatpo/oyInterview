@@ -3,7 +3,7 @@
 docker pull postgres
 
 docker run --name postgres1 \ 
-    -e  POSTGRES_PASSWORD=123qwe \
+    -e POSTGRES_PASSWORD=123qwe \
     -e POSTGRES_USER=root \
     -v /Users/ouyang/postgres_home/data:/var/lib/postgresql/data \
     -d -p5432:5432 postgres
