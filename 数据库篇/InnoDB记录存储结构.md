@@ -126,9 +126,10 @@ varchar 肯定是变长字段，那么 char(10)呢？
 |row_id	|否	|6字节	|行ID，唯一标识一条记录|
 |transaction_id	|是	|6字节|	事务ID|
 |roll_pointer	|是	|7字节|	回滚指针|
+
 为啥只有 row_id 才是可选？什么情况下 mysql 会自动帮你添加 row_id 列？
 * 没有自定义主键
-* 以及Unique键
+* 非空Unique键
 
 所以对于record_format_demo表来说，真实的 2 个记录：
 ![记录的真实数据](../imgs/mysql/记录的真实数据.png?raw=true)
