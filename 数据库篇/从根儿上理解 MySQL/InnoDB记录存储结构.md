@@ -67,7 +67,7 @@ Max_data_length: 0
 ```
 
 # compact 行格式
-![compat行格式示意图](../imgs/mysql/compat行格式示意图.png?raw=true)
+![compat行格式示意图](../../imgs/mysql/compat行格式示意图.png?raw=true)
 
 ## 记录的额外信息
 ### 变长字段长度列表
@@ -103,10 +103,10 @@ varchar 肯定是变长字段，那么 char(10)呢？
 * 逆序(理由同可变字段长度列表)
 * 只表示可为 NULL 的 列(排除：主键列、被NOT NULL修饰的列)
 * 高位补0: 比如我只有 3 个可为 NULL 字段，都为 1，那么就是 111，补全后：00000111
-![NULL值列表](../imgs/mysql/NULL值列表.png?raw=true)
+![NULL值列表](../../imgs/mysql/NULL值列表.png?raw=true)
 
 ### 重头戏：记录头信息
-![记录头信息](../imgs/mysql/记录头信息.png?raw=true)
+![记录头信息](../../imgs/mysql/记录头信息.png?raw=true)
 
 | 名称	| 大小（单位：bit） |	描述 |
 | :-----|---- | :---- |
@@ -139,11 +139,11 @@ varchar 肯定是变长字段，那么 char(10)呢？
 * 非空Unique键
 
 所以对于record_format_demo表来说，真实的 2 个记录：
-![记录的真实数据](../imgs/mysql/记录的真实数据.png?raw=true)
+![记录的真实数据](../../imgs/mysql/记录的真实数据.png?raw=true)
 
 # redundant 行格式（5.0之前）
 
-![Redundant行格式示意图](../imgs/mysql/Redundant行格式示意图.png?raw=true)
+![Redundant行格式示意图](../../imgs/mysql/Redundant行格式示意图.png?raw=true)
 
 * 和 compact行格式 类似
 * 记录的额外信息变了
@@ -194,4 +194,4 @@ varchar 肯定是变长字段，那么 char(10)呢？
 * utf-8: 1 个字符最大可能是 3 字节，真实数据最大长度可以是 21844
 
 ## 1 页 16KB，也才16384个字节，那么65532个字节怎么存？？
-![记录数据溢出示意图](../imgs/mysql/记录数据溢出示意图.png?raw=true)
+![记录数据溢出示意图](../../imgs/mysql/记录数据溢出示意图.png?raw=true)

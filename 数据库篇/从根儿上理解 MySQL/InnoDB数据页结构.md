@@ -23,7 +23,7 @@
 * 数据页：有一个专属的 Page Header
 
 看看数据库的结构图：
-![InnoDB数据页结构示意图.png](../imgs/mysql/InnoDB数据页结构示意图.png?raw=true)
+![InnoDB数据页结构示意图.png](../../imgs/mysql/InnoDB数据页结构示意图.png?raw=true)
 * File Header（每个页都有的 header）
 * Page Header（数据页特有的 header）
 * 最小记录 infimum 与最大记录 supremum，固定大小，26 字节(为啥不是25字节呢？)
@@ -119,7 +119,7 @@
 |没想到，这是啥|FIL_PAGE_ARCH_LOG_NO_OR_SPACE_ID|	4字节|	页属于哪个表空间|
 
 双指针链表结构示意图如下：
-![数据页双指针链表示意图.png](../imgs/mysql/数据页双指针链表示意图.png?raw=true)
+![数据页双指针链表示意图.png](../../imgs/mysql/数据页双指针链表示意图.png?raw=true)
 
 
 # File Trailer
