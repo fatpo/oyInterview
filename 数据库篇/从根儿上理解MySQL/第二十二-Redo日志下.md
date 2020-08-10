@@ -12,6 +12,7 @@
 * [怎么甩掉数据还是可能丢失的锅](#怎么甩掉数据还是可能丢失的锅)
 * [崩溃恢复](#崩溃恢复)
 * [查看系统中的各种LSN值](#查看系统中的各种LSN值)
+* [最后再捋一捋修改数据的全流程](#最后再捋一捋修改数据的全流程)
    
 # redo日志刷盘的时机
 * log buffer 不够用了
@@ -62,7 +63,8 @@ block1一共有用的字节是：52字节，整个block字节是512字节，足�
 之前有多小气：
 * 每条记录record的额外信息里面，有可变字段长度列表，有null值列表，就是为了能省几个字节，宁愿多多算算offset也不想多占用空间
 * mtr的结束符号，是的，怎么看一个mtr是否结束，就看结尾有没有一个MLOG_MULTI_REC_END，本来这个设计就很完美了，结果为了小气，对于某些只有一行的mtr，
-不带这个结束标识符了，而是在redo日志的header里面的某一个bit来表示，如果是1表示mtr只有1条redo日志，就默认带了MLOG_MULTI_REC_END。
+不带这个结束标识符了，而是在redo日志的header里面的某一个bit来表示，如果是1表示mtr只有1条redo日志，就默认带了 MLOG_MULTI_REC_END。
+* 为redo日志（type+spaceId+pageNo+data）的type设置了50多个类型，想方设法节约空间，什么1字节2字节，紧凑不紧凑的。
 
 ## 个人给innodb的浪费洗个免费的地
 * 不比行记录record、redo日志的mtr组那些数据量庞大的业务，这个logfile顶天了才100个，也就是顶多400个block1，节省不了多少。
@@ -93,8 +95,20 @@ block1一共有用的字节是：52字节，整个block字节是512字节，足�
 # checkpoint
 
 ## 什么是checkpoint
-当Buffer Pool 里面的脏页被刷盘了(那个缓存页的节点会从flush链表中删除)，那么我们在 Log Buffer 里面的redo日志可以被覆盖了。
-此时就可以来一波checkpoint_lsn的增加，这个增加checkpoint_lsn的操作就是checkpoint。
+
+满足某些判定条件的时候把脏页刷盘的过程叫做：checkpoint！
+* 在某些情况下触发checkpoint，脏页刷盘
+    * Buffer Pool 不够用时
+    * log Buffer 不够用时
+* checkpoint的方式
+    * Sharp Checkpoint： 数据库关闭的时候，全部脏页刷盘
+    * Fuzzy Checkpoint： mysql运行时innodb引擎每次只刷新一部分脏页
+        * MasterThread Checkpoint： 每秒或者每10秒从Buffer Pool的flush list刷一定比例回盘
+        * FLUSH_LRU_LIST Checkpoint： 为了保证Buffer Pool的lru list至少有100个页面（满的lru可以有8K个页 = 128MB/16KB）
+        * Async/Sync Flush Checkpoint: log buffer中的redo日志不可用的情况，需要强制刷新页回磁盘，此时的页时脏页列表选取的
+        * Dirty Page too much Checkpoint：为了保证Buffer Pool的flush list数量别太多，超过75%就来一波checkpoint
+        
+checkpoint_lsn：checkpoint触发过程需要依赖lsn的定位，这个lsn来自：Buffer Pool 的flush链表的最后一个节点的`oldest_modification`!
 
 ## checkpoint 过程
 * 计算当前log buffer可被覆盖的lsn值：flush 链表的`最后一个节点`里面的 oldest_modification ，赋值给 checkpoint_lsn
@@ -162,3 +176,25 @@ Last checkpoint at  124052494       # 上一次的checkpoint_lsns
 ----------------------
 (...省略后边的许多状态)
 ```
+
+# 最后再捋一捋修改数据的全流程
+* 一条语句可能会产生20-30条redo日志，把这波redo日志分成n组mtr
+* 每一个mtr表示对底层页面的一次`原子`操作
+* 在mtr结束时，会把这一组redo日志写入到log buffer中
+* 在mtr结束时，会把能修改过的页面加入到Buffer Pool的flush链表
+    * 具体是脏页对应的控制块加到flush链表的头
+    * flush链表的头节点的设置 oldest_modification（修改该页面的mtr开始时对应的lsn值）
+    * flush链表的头节点的设置 newest_modification（修改该页面的mtr结束时对应的lsn值）
+* 后台线程-flush链表刷盘： flush 链表最后一个节点（控制块）对应的脏页刷盘，然后该节点删除
+* 后台线程-redo日志刷盘：每秒都会刷新一次log buffer中的redo日志到磁盘
+* 后台或用户同步线程-checkpoint：
+    * 在某些情况下触发checkpoint，脏页刷盘
+        * Buffer Pool 不够用时
+        * log Buffer 不够用时
+    * checkpoint的方式
+        * Sharp Checkpoint： 数据库关闭的时候，全部脏页刷盘
+        * Fuzzy Checkpoint： mysql运行时innodb引擎每次只刷新一部分脏页
+            * MasterThread Checkpoint： 每秒或者每10秒从Buffer Pool的flush list刷一定比例回盘
+            * FLUSH_LRU_LIST Checkpoint： 为了保证Buffer Pool的lru list至少有100个页面（满的lru可以有8K个页 = 128MB/16KB）
+            * Async/Sync Flush Checkpoint: log buffer中的redo日志不可用的情况，需要强制刷新页回磁盘，此时的页时脏页列表选取的
+            * Dirty Page too much Checkpoint：为了保证Buffer Pool的flush list数量别太多，超过75%就来一波checkpoint
