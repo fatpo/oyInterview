@@ -12,5 +12,6 @@
   * [[二十一] redo日志上](https://github.com/emaste-r/oyInterview/blob/master/数据库篇/从根儿上理解MySQL/第二十一-Redo日志上.md)
   * [[二十二] redo日志下](https://github.com/emaste-r/oyInterview/blob/master/数据库篇/从根儿上理解MySQL/第二十二-Redo日志下.md)
   * [[二十三] undo日志上](https://github.com/emaste-r/oyInterview/blob/master/数据库篇/从根儿上理解MySQL/第二十三-undo日志上.md)
+  * [[二十四] undo日志下](https://github.com/emaste-r/oyInterview/blob/master/数据库篇/从根儿上理解MySQL/第二十四-undo日志下.md)
   * [sysbench压测mysql性能](https://github.com/emaste-r/oyInterview/blob/master/数据库篇/sysbench压测mysql性能.md)
   * [pgbench压测postgres性能](https://github.com/emaste-r/oyInterview/blob/master/数据库篇/pgbench压测postgres性能.md)
