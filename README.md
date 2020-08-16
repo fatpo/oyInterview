@@ -17,3 +17,6 @@
   * [[二十六] 锁](https://github.com/emaste-r/oyInterview/blob/master/数据库篇/从根儿上理解MySQL/第二十六-锁.md)
   * [sysbench压测mysql性能](https://github.com/emaste-r/oyInterview/blob/master/数据库篇/sysbench压测mysql性能.md)
   * [pgbench压测postgres性能](https://github.com/emaste-r/oyInterview/blob/master/数据库篇/pgbench压测postgres性能.md)
+
+
+关于数据库 innodb 的，我只是做一些读书笔记，原作在此： https://juejin.im/book/6844733769996304392/section/6844733769945972749
