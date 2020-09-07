@@ -1,7 +1,5 @@
 package datastruct;
 
-import org.junit.Test;
-
 import java.security.SecureRandom;
 import java.util.Random;
 
@@ -12,52 +10,6 @@ public class SkipList {
     SkipNode tail;
     Random random;
 
-
-    @Test
-    public void test() {
-        SkipList skipList = new SkipList();
-        skipList.insert("aaa", 123);
-        skipList.insert("bbb", 3);
-        skipList.insert("ccc", 12);
-
-        skipList.printSkipList();
-
-        assert skipList.get("aaa") == 123;
-        assert skipList.get("bbb") == 3;
-        assert skipList.get("ccc") == 12;
-
-        skipList.insert("aaa", 145);
-        assert skipList.get("aaa") == 145;
-    }
-
-    @Test
-    public void testPerf() {
-        SkipList skipList = new SkipList();
-        long startTime = System.currentTimeMillis();
-        int nodes = 10;
-        String[] keys = new String[nodes];
-        int[] values = new int[nodes];
-        for (int i = 0; i < nodes; i++) {
-            String key = random.nextInt(nodes * 100) + "";
-            int value = random.nextInt(nodes);
-            skipList.insert(key, value);
-            keys[i] = key;
-            values[i] = value;
-        }
-        long endTime = System.currentTimeMillis();
-        System.out.println("插入" + nodes + "，时间耗时：" + (endTime - startTime) + "");
-        skipList.printSkipList();
-
-        for (int i = 0; i < nodes; i++) {
-            String key = keys[i];
-            int value = values[i];
-            System.out.println(key + " " + value);
-            assert skipList.get(key) == value;
-        }
-        long endTime2 = System.currentTimeMillis();
-        System.out.println("查询" + nodes + "，时间耗时：" + (endTime2 - endTime) + "");
-
-    }
 
     public SkipList() {
         curHeight = 0;
@@ -74,6 +26,7 @@ public class SkipList {
     }
 
     public void printSkipList() {
+        System.out.println("开始打印跳跃表...");
         SkipNode x = head;
         SkipNode x2 = head;
         assert x2 != null;
@@ -93,10 +46,19 @@ public class SkipList {
         }
     }
 
+    /**
+     * 核心函数：
+     * 1、从最高层开始往right方向找；
+     * 2、打不过了就往下走一层；
+     * 3、循环1，2步骤直到最后一层。
+     *
+     * @param key 待查找的key
+     * @return <= key 的那个结点
+     */
     public SkipNode findNode(String key) {
         SkipNode x = head;
         while (true) {
-            while (!x.right.key.equals(SkipNode.maxPos) && key.compareTo(x.right.key) <= 0) {
+            while (!x.right.key.equals(SkipNode.maxPos) && key.compareTo(x.right.key) >= 0) {
                 x = x.right;
             }
             if (x.down != null) {
@@ -162,8 +124,12 @@ public class SkipList {
             newNode = x;
         }
 
+        this.nodeNum++;
     }
 
+    /**
+     * 创一个新层
+     */
     private void makeNewLevel() {
         SkipNode p1 = new SkipNode(SkipNode.minPos, null);
         SkipNode p2 = new SkipNode(SkipNode.maxPos, null);
@@ -183,7 +149,28 @@ public class SkipList {
         curHeight++;
     }
 
+    public Integer remove(String key) {
+        SkipNode node = findNode(key);
+        if (!key.equals(node.key)) {
+            System.out.println("node: " + key + " not exist!");
+            return null;
+        }
 
+        int oldValue = node.value;
+
+        // 删除高层节点，如果有的话
+        while (node != null) {
+            node.left.right = node.right;
+            node.right.left = node.left;
+
+            node = node.up;
+        }
+
+        // 总体结点数量 - 1
+        this.nodeNum--;
+
+        return oldValue;
+    }
 }
 
 
