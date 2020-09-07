@@ -2,7 +2,6 @@ package datastruct;
 
 import org.junit.Test;
 
-import java.nio.channels.SelectionKey;
 import java.security.SecureRandom;
 import java.util.Random;
 
@@ -21,6 +20,8 @@ public class SkipList {
         skipList.insert("bbb", 3);
         skipList.insert("ccc", 12);
 
+        skipList.printSkipList();
+
         assert skipList.get("aaa") == 123;
         assert skipList.get("bbb") == 3;
         assert skipList.get("ccc") == 12;
@@ -33,7 +34,7 @@ public class SkipList {
     public void testPerf() {
         SkipList skipList = new SkipList();
         long startTime = System.currentTimeMillis();
-        int nodes = 10000;
+        int nodes = 10;
         String[] keys = new String[nodes];
         int[] values = new int[nodes];
         for (int i = 0; i < nodes; i++) {
@@ -45,6 +46,7 @@ public class SkipList {
         }
         long endTime = System.currentTimeMillis();
         System.out.println("插入" + nodes + "，时间耗时：" + (endTime - startTime) + "");
+        skipList.printSkipList();
 
         for (int i = 0; i < nodes; i++) {
             String key = keys[i];
@@ -69,6 +71,26 @@ public class SkipList {
 
         head = p1;
         tail = p2;
+    }
+
+    public void printSkipList() {
+        SkipNode x = head;
+        SkipNode x2 = head;
+        assert x2 != null;
+
+        while (true) {
+            while (x != null) {
+                System.out.print(x.key + " ");
+                x = x.right;
+            }
+            System.out.println();
+            if (x2.down != null) {
+                x = x2.down;
+                x2 = x2.down;
+            } else {
+                break;
+            }
+        }
     }
 
     public SkipNode findNode(String key) {
@@ -125,6 +147,7 @@ public class SkipList {
             while (foundNode.up == null) {
                 foundNode = foundNode.left;
             }
+            foundNode = foundNode.up;
 
             // 这一层也要创建一个新的节点
             SkipNode x = new SkipNode(key, null);
